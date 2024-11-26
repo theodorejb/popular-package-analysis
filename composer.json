@@ -1,5 +1,24 @@
 {
+    "description": "Analyze code from the most popular Composer packages",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nikita Popov",
+            "email": "nikita.ppv@gmail.com"
+        },
+        {
+            "name": "Theodore Brown",
+            "email": "theodorejb@outlook.com"
+        }
+    ],
     "require": {
-        "nikic/php-parser": "^4.2"
+        "php": ">=8.0",
+        "nikic/php-parser": "^5.3"
+    },
+    "autoload": {
+        "psr-4": {
+            "PackageAnalyzer\\": "src/"
+        }
     }
 }

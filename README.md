@@ -1,14 +1,14 @@
 Analysis of popular composer packages
 -------------------------------------
 
-This repository contains a couple of scripts to download the most popular composer packages and
-analyze them. Usage:
+Tools for downloading the most popular Composer packages and analyzing the code.
 
-```
-# Download 1000 most popular packages
-php download.php 0 1000
-./extract.sh
-```
+## Usage
+
+1. Clone the repository.
+2. Run `composer install`.
+3. Run `php download.php 0 1000` to download and extract the top 1000 Composer packages.
+4. Create an analysis script for your use case and run it.
 
 The `zipballs/` directory contains downloaded archives, while `sources/` contains the extracted
 sources.
