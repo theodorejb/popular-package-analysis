@@ -11,7 +11,9 @@ if ($argc < 3) {
 
 $minPackage = (int) $argv[1];
 $maxPackage = (int) $argv[2];
-$downloader = new Downloader();
+
+$extractPhpOnlyWith7zip = isset($argv[3]) && $argv[3] === '-p';
+$downloader = new Downloader($extractPhpOnlyWith7zip);
 
 foreach ($downloader->getTopPackages($minPackage, $maxPackage) as $i => $package) {
     echo "[$i] $package\n";

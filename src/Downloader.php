@@ -7,6 +7,10 @@ use Generator;
 
 class Downloader
 {
+    public function __construct(
+        public bool $extractPhpOnlyWith7zip = false,
+    ) {}
+
     public function getTopPackages(int $start, int $end): Generator
     {
         $perPage = 15;
@@ -43,7 +47,7 @@ class Downloader
 
         if (isset($versions['dev-master'])) {
             $version = 'dev-master';
-        } else if (isset($versions['dev-main'])) {
+        } elseif (isset($versions['dev-main'])) {
             $version = 'dev-main';
         } else {
             // Pick latest version.
@@ -72,10 +76,10 @@ class Downloader
             throw new Exception("Download error: " . var_export($execOutput, true));
         }
 
-        self::extract($zipball, "{$sourceDir}/{$name}");
+        $this->extract($zipball, "{$sourceDir}/{$name}");
     }
 
-    private static function extract(string $zipball, string $targetDir): void
+    private function extract(string $zipball, string $targetDir): void
     {
         if (is_dir($targetDir)) {
             echo "Deleting existing $targetDir\n";
@@ -83,7 +87,13 @@ class Downloader
         }
 
         mkdir($targetDir, 0777, true);
-        $cmd = 'tar -xf ' . escapeshellarg($zipball) . ' -C ' . escapeshellarg($targetDir);
+
+        if ($this->extractPhpOnlyWith7zip) {
+            $cmd = '7z x ' . escapeshellarg($zipball) . ' -o' . escapeshellarg($targetDir) . ' -ir!*.php';
+        } else {
+            $cmd = 'tar -xf ' . escapeshellarg($zipball) . ' -C ' . escapeshellarg($targetDir);
+        }
+
         exec($cmd, $execOutput, $execRetval);
 
         if ($execRetval !== 0) {
@@ -96,6 +106,11 @@ class Downloader
     private static function renameFirstChildToTarget(string $targetDir): void
     {
         $child = self::getFirstChildDir($targetDir);
+
+        if ($child === '') {
+            return;
+        }
+
         $parentDir = dirname($targetDir);
         $tempPath = $parentDir . DIRECTORY_SEPARATOR . $child;
         $result = rename($targetDir . DIRECTORY_SEPARATOR . $child, $tempPath);
@@ -122,7 +137,7 @@ class Downloader
             }
         }
 
-        throw new Exception('Failed to find child directory');
+        return ''; // no subfolders (e.g. because no PHP files in package)
     }
 
     private static function rmDir(string $dir): void

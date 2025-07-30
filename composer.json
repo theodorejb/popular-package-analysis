@@ -14,7 +14,7 @@
     ],
     "require": {
         "php": ">=8.0",
-        "nikic/php-parser": "^5.3"
+        "nikic/php-parser": "^5.6"
     },
     "autoload": {
         "psr-4": {
