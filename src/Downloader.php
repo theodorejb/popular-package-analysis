@@ -13,13 +13,13 @@ class Downloader
 
     public function getTopPackages(int $start, int $end): Generator
     {
-        $perPage = 15;
+        $perPage = 100;
         $page = intdiv($start, $perPage);
         $id = $page * $perPage;
 
         while (true) {
             $page++;
-            $url = "https://packagist.org/explore/popular.json?page={$page}";
+            $url = "https://packagist.org/explore/popular.json?page={$page}&per_page={$perPage}";
             $json = json_decode(file_get_contents($url));
 
             foreach ($json->packages as $package) {
@@ -41,20 +41,10 @@ class Downloader
             return;
         }
 
-        $url = "https://packagist.org/packages/{$name}.json";
+        $url = "https://repo.packagist.org/p2/{$name}~dev.json";
         $json = json_decode(file_get_contents($url), true);
-        $versions = $json['package']['versions'];
-
-        if (isset($versions['dev-master'])) {
-            $version = 'dev-master';
-        } elseif (isset($versions['dev-main'])) {
-            $version = 'dev-main';
-        } else {
-            // Pick latest version.
-            $version = array_key_first($versions);
-        }
-
-        $package = $versions[$version];
+        $package = $json['packages'][$name][0]; // latest dev release
+        $version = $package['version'];
 
         if ($package['dist'] === null) {
             echo "Skipping $name due to missing dist\n";
