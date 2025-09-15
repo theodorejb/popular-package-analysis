@@ -43,7 +43,16 @@ class Downloader
 
         $url = "https://repo.packagist.org/p2/{$name}~dev.json";
         $json = json_decode(file_get_contents($url), true);
-        $package = $json['packages'][$name][0]; // latest dev release
+
+        if (isset($json['packages'][$name][0])) {
+            $package = $json['packages'][$name][0]; // latest dev release
+        } else {
+            // no dev release published (rare)
+            $url = "https://repo.packagist.org/p2/{$name}.json";
+            $json = json_decode(file_get_contents($url), true);
+            $package = $json['packages'][$name][0]; // latest tagged release
+        }
+
         $version = $package['version'];
 
         if ($package['dist'] === null) {
